@@ -1,6 +1,7 @@
 package com.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.entity.Hospital;
 import com.entity.Patient;
+import com.repository.HospitalRepository;
 import com.repository.PatientRepository;
 import com.service.HospitalService;
 import com.service.PatientService;
@@ -20,7 +22,7 @@ import vo.PatientVO;
 public class PatientServiceImpl implements PatientService{
 
 	final private PatientRepository pr;
-	
+	final private HospitalRepository hr;
 	@Override
 	public String insert() {
 		System.out.println("insertPatient");
@@ -28,6 +30,7 @@ public class PatientServiceImpl implements PatientService{
 		ArrayList<Patient> list = new ArrayList<>();
 		
 		PatientVO vo  = new PatientVO();
+		List<Hospital> hos = hr.findAll();
 		for(int i=0; i<100; i++) {			
 			vo.setPatientName("환자" + String.valueOf(i));
 			vo.setPatientRegNo("등록번호" + String.valueOf(i));
@@ -37,8 +40,17 @@ public class PatientServiceImpl implements PatientService{
 			}else {
 				vo.setPatientGenderCd("F");
 			}
+			
+			if(i%3 == 1) {
+				vo.setHospitalID(hos.get(0).getHospitalID());
+			}else if(i%3 == 2) {
+				vo.setHospitalID(hos.get(1).getHospitalID());
+			}else {
+				vo.setHospitalID(hos.get(2).getHospitalID());
+			}
 			vo.setPatientBirthDate("20220829");
 			vo.setPatientTelno("010-1111-111"+String.valueOf(i));
+			
 			
 			list.add(new Patient(vo.getPatientName(), 
 					vo.getPatientRegNo(), 
@@ -46,7 +58,7 @@ public class PatientServiceImpl implements PatientService{
 					vo.getPatientGenderCd(), 
 					vo.getPatientBirthDate(), 
 					vo.getPatientTelno(),
-					1l));
+					vo.getHospitalID()));
 		}
 		
 		pr.saveAll(list);
@@ -56,7 +68,8 @@ public class PatientServiceImpl implements PatientService{
 
 	@Override
 	public String update() {
-		Patient target = pr.getById(4l);
+		List<Patient> list = pr.findAll();
+		Patient target = pr.getById(list.get(0).getHospitalID());
 		String before = target.getPatientName();
 		target.setPatientName("바꾸자이름");
 		pr.save(target);
@@ -72,5 +85,82 @@ public class PatientServiceImpl implements PatientService{
 	public String delete() {
 		pr.deleteAll();
 		return "detele success";
+	}
+	
+	@Override
+	public String insertAct5() {
+		System.out.println("insertPatient");
+		pr.deleteAll();
+		ArrayList<Patient> list = new ArrayList<>();
+		
+		PatientVO vo  = new PatientVO();
+		for(int i=0; i<100; i++) {			
+			vo.setPatientName("환자" + String.valueOf(i));			
+			vo.setPatientGroupCd("01"); // 성별코드
+			String hoscode="";
+			List<Hospital> hos = hr.findAll();
+			if(i%3==1){
+				vo.setPatientGenderCd("M");
+				hoscode = "1번병원";
+				vo.setHospitalID(hos.get(0).getHospitalID());
+			}else if(i%3 ==2) {
+				vo.setPatientGenderCd("F");
+				hoscode = "2번병원";
+				vo.setHospitalID(hos.get(1).getHospitalID());
+			}else {
+				vo.setPatientGenderCd("M");
+				hoscode = "3번병원";
+				vo.setHospitalID(hos.get(2).getHospitalID());
+			}
+			
+			vo.setPatientRegNo(hoscode + "등록번호" + String.valueOf(i));
+			vo.setPatientBirthDate("20220829");
+			vo.setPatientTelno("010-1111-111"+String.valueOf(i));
+			
+			list.add(new Patient(vo.getPatientName(), 
+					vo.getPatientRegNo(), 
+					vo.getPatientGroupCd(), 
+					vo.getPatientGenderCd(), 
+					vo.getPatientBirthDate(), 
+					vo.getPatientTelno(),
+					vo.getHospitalID()));
+		}
+		
+		pr.saveAll(list);
+		
+		return "return Patient save success count " + list.size();
+	}
+	
+	@Override
+	public String updateAct5() {
+		List<Patient> list = pr.findAll();
+		Patient target = pr.getById(list.get(0).getPatientId());
+		String before = target.getPatientName();
+		String telNo = target.getPatientTelno();
+		target.setPatientName("바꾸자이름");
+		target.setPatientTelno(String.valueOf(new Date().getTime()));
+		pr.save(target);
+		target = pr.getById(list.get(0).getPatientId());
+		return "update success change name " + before + " " + telNo + " " + "->" + 
+				target.getPatientName() + " " + target.getPatientTelno();
+	}
+	
+	@Override
+	public String deleteAct5() {
+		List<Patient> list = pr.findAll();
+		Patient target = pr.getById(list.get(0).getPatientId());
+		pr.delete(target);
+		return "detele success patient id : " + list.get(0).getPatientId() ;
+	}
+	
+	@Override
+	public Patient searchAct5() {
+		List<Patient> list = pr.findAll();
+		return pr.getById(list.get(0).getPatientId());
+	}
+	
+	@Override
+	public List<Patient> searchAllAct5() {
+		return pr.findAll();
 	}
 }

@@ -23,9 +23,12 @@ public class HospitalServiceImpl implements HospitalService{
 		System.out.println("insertHospital");
 		hr.deleteAll();
 		Hospital first = new Hospital("병원1","1111","원장1");
-		
+		Hospital second = new Hospital("병원2","2222","원장2");
+		Hospital third = new Hospital("병원3","3333","원장3");
 		
 		hr.save(first);
+		hr.save(second);
+		hr.save(third);
 		
 		List<Hospital> list = hr.findAll();
 		

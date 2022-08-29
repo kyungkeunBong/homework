@@ -7,9 +7,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.entity.Code;
+import com.entity.Hospital;
 import com.entity.Patient;
 import com.entity.PatientVisit;
 import com.repository.CodeRepository;
+import com.repository.HospitalRepository;
 import com.repository.PatientRepository;
 import com.repository.VisitRepository;
 import com.service.PatientVisitService;
@@ -24,6 +26,7 @@ public class PatientVisitServiceImpl implements PatientVisitService{
 	final private VisitRepository vr;
 	final private CodeRepository cr;
 	final private PatientRepository pr;
+	final private HospitalRepository hr;
 	
 	@Override
 	public String insert() {
@@ -31,9 +34,17 @@ public class PatientVisitServiceImpl implements PatientVisitService{
 		vr.deleteAll();
 		ArrayList<PatientVisit> list = new ArrayList<>();
 		PatientVisitVO vo  = new PatientVisitVO();
+		List<Hospital> hos = hr.findAll();
+		List<Patient> pat = pr.findAll();
 		for(int i=0; i<100; i++) {			
-			vo.setHospitalID(1l);
-			vo.setPatientId((i%10) + 1l);
+			if(i%3 == 1) {
+				vo.setHospitalID(hos.get(0).getHospitalID());
+			}else if(i%3 == 2) {
+				vo.setHospitalID(hos.get(1).getHospitalID());
+			}else {
+				vo.setHospitalID(hos.get(2).getHospitalID());
+			}
+			vo.setPatientId(pat.get(i).getPatientId());
 			vo.setRegDate(new Date());
 			vo.setVisitGroupCd("02");
 			if(i%3 == 1) {
@@ -58,7 +69,8 @@ public class PatientVisitServiceImpl implements PatientVisitService{
 
 	@Override
 	public String update() {
-		PatientVisit target = vr.getById(4l);
+		List<PatientVisit> list = vr.findAll();
+		PatientVisit target = vr.getById(list.get(0).getPatientVisitId());
 		String before = target.getVisitStatCd();
 		Code beforeCode = cr.getOne(before);
 		long time = new Date().getTime();
