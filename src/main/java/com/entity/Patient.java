@@ -1,6 +1,7 @@
 package com.entity;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.persistence.CascadeType;
@@ -38,6 +39,8 @@ public class Patient {
     private String patientName;
 	@Column(name="PATIENT_REG_NO")
     private String patientRegNo;
+	@Column(name="PATIENT_GENDER_GROUP_CD")
+    private String patientGenderGroupCd;
 	@Column(name="PATIENT_GENDER_CD")
     private String patientGenderCd;
 	@Column(name="PATIENT_BIRTHDATE")
@@ -51,11 +54,20 @@ public class Patient {
     
     @Builder
     public Patient(String patientName, String patientRegNo,
-    		 String patientGenderCd, String patientBirthDate, String patientTelno){ 
+   		 String patientGenderGroupCd, String patientGenderCd, String patientBirthDate, 
+   		 String patientTelno, long hospitalID){ 
         this.patientName = patientName;
         this.patientRegNo = patientRegNo;
+        this.patientGenderGroupCd = patientGenderGroupCd;
         this.patientGenderCd = patientGenderCd;
         this.patientBirthDate = patientBirthDate;
         this.patientTelno = patientTelno;
+        this.hospitalID = hospitalID;
     }
+	public void addPatientVisit(PatientVisit visit){
+		if( visits == null ){
+			visits = new ArrayList<PatientVisit>();
+		}
+		visits.add(visit);
+	}
 }

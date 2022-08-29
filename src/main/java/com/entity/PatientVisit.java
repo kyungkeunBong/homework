@@ -1,6 +1,7 @@
 package com.entity;
 
-import java.sql.Date;
+
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,12 +34,19 @@ public class PatientVisit {
     private long patientId;
 	@Column(name="REG_DATE")
     private Date regDate;
+	@Column(name="VISIT_STAT_GROUP_CD")
+    private String visitStatGroupCd;
 	@Column(name="VISIT_STAT_CD")
     private String visitStatCd;
     
     @Builder
-    public PatientVisit(Date regDate, String visitStatCd) {
-        this.regDate = regDate;
+    public PatientVisit(Date regDate, 
+    		String visitStatGroupCd, String visitStatCd,
+    		long hospitalID, long patientId) {
+    	this.regDate = regDate;
+    	this.visitStatGroupCd = visitStatGroupCd;
         this.visitStatCd = visitStatCd;
+        this.hospitalID = hospitalID;
+        this.patientId = patientId;
     }
 }
