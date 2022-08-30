@@ -56,5 +56,14 @@ public class PatientController {
 	public List<Patient> searchAllAct5() {
 		return patientService.searchAllAct5();
 	}
+	@RequestMapping(method=RequestMethod.GET , value="/patient/queryDslRead")
+	public List<Patient> findbyInput() {
+		return patientService.findbyInput("봉경근", "봉경근등록번호", "봉경근생일");
+	}
+	
+	@RequestMapping(method=RequestMethod.GET , value="/patient/queryDslPage")
+	public List<Patient> findPage() {
+		return patientService.findPage();
+	}
 }
 

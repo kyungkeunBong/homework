@@ -14,4 +14,7 @@ public interface PatientService {
 	public String deleteAct5();
 	public Patient searchAct5();
 	public List<Patient> searchAllAct5();
+	List<Patient> findbyInput(String pName, String pregNo, String pBirth);
+	List<Patient> findPage();
+	
 }

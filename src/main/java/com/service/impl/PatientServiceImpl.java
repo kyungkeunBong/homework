@@ -5,10 +5,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.entity.Hospital;
 import com.entity.Patient;
+import com.entity.QPatient;
+import com.querydsl.core.QueryResults;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.repository.HospitalRepository;
 import com.repository.PatientRepository;
 import com.service.HospitalService;
@@ -23,6 +29,7 @@ public class PatientServiceImpl implements PatientService{
 
 	final private PatientRepository pr;
 	final private HospitalRepository hr;
+	private final JPAQueryFactory queryFactory;
 	@Override
 	public String insert() {
 		System.out.println("insertPatient");
@@ -51,14 +58,25 @@ public class PatientServiceImpl implements PatientService{
 			vo.setPatientBirthDate("20220829");
 			vo.setPatientTelno("010-1111-111"+String.valueOf(i));
 			
+			if(i==99) {
+				list.add(new Patient("봉경근", 
+						"봉경근등록번호", 
+						vo.getPatientGroupCd(), 
+						vo.getPatientGenderCd(), 
+						"봉경근생일", 
+						vo.getPatientTelno(),
+						vo.getHospitalID()));
+				
+			}else {
+				list.add(new Patient(vo.getPatientName(), 
+						vo.getPatientRegNo(), 
+						vo.getPatientGroupCd(), 
+						vo.getPatientGenderCd(), 
+						vo.getPatientBirthDate(), 
+						vo.getPatientTelno(),
+						vo.getHospitalID()));
+			}
 			
-			list.add(new Patient(vo.getPatientName(), 
-					vo.getPatientRegNo(), 
-					vo.getPatientGroupCd(), 
-					vo.getPatientGenderCd(), 
-					vo.getPatientBirthDate(), 
-					vo.getPatientTelno(),
-					vo.getHospitalID()));
 		}
 		
 		pr.saveAll(list);
@@ -162,5 +180,31 @@ public class PatientServiceImpl implements PatientService{
 	@Override
 	public List<Patient> searchAllAct5() {
 		return pr.findAll();
+	}
+
+	@Override
+	public List<Patient> findbyInput(String pName, String pregNo, String pBirth) {
+		QPatient qPatient = QPatient.patient;
+		return queryFactory.selectFrom(qPatient)
+				.where(
+						qPatient.patientName.eq(pName)
+						.and(qPatient.patientRegNo.eq(pregNo)
+						.and(qPatient.patientBirthDate.eq(pBirth)))
+						).fetch();
+	}
+	
+	@Override
+	public List<Patient> findPage() {
+		QPatient qPatient = QPatient.patient;
+		Pageable pageable = PageRequest.of(0, 10);
+		QueryResults<Patient> result = 
+				queryFactory.selectFrom(qPatient)
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
+				.fetchResults();
+		
+		long total  = result.getTotal(); // 전체개수
+		System.out.println("#### 총 갯수는 : "  + total);
+		return result.getResults();
 	}
 }
